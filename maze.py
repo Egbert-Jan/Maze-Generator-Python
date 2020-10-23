@@ -10,50 +10,43 @@ import time
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Maze generator')
 
-cols = 20; rows = 20
+cols = 9; rows = 9
 
-def makeMap(screen):
-    cellMap = []
-    for y in range(rows):
-        row = []
-        for x in range(cols):
-            row.append(Cell(x, y, 40, screen))
-        cellMap.append(row)
-    return cellMap
-
+cellMap = []
 stack = Stack()
+
+for y in range(rows):
+    row = []
+    for x in range(cols):
+        row.append(Cell(x, y, 40, screen))
+    cellMap.append(row)
 
 def draw():
     for row in cellMap:
         for element in row:
             element.draw()
-            # stack.contains(element.x, element.y)
-
-
-
-cellMap = makeMap(screen)
-
-draw()
-pygame.display.update()
-
 
 startCell = cellMap[0][0]
 startCell.visited = True
 stack.push(startCell)
 
+
+
 def generateMaze():
     vistiedCells = 0
     while vistiedCells != cols*rows-1:
+
+        currentCell = stack.top()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 
 
-        if stack.top() == None:
+        if currentCell == None:
             stack.pop()
             continue
 
-        neighbors = stack.top().getNeighbors(cellMap)
+        neighbors = currentCell.getNeighbors(cellMap)
 
         filteredNeighbors = list(filter(lambda c: c.visited == False, neighbors))
 
@@ -65,13 +58,26 @@ def generateMaze():
             randomNeighbor = filteredNeighbors[randomNr]
             randomNeighbor.visited = True
 
+            randomNeighbor.connectedNeighbors.append(currentCell)
+            currentCell.connectedNeighbors.append(randomNeighbor)
+
             stack.push(randomNeighbor)
 
             vistiedCells += 1
 
-
+        pygame.draw.rect(screen, (0, 0, 0), (0, 0, rows*40, cols*40))
         draw()
-        pygame.display.update()
+        pygame.display.flip()
 
 
 generateMaze()
+
+for row in cellMap:
+    for element in row:
+        print(element.x, element.y, len(element.connectedNeighbors))
+
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()

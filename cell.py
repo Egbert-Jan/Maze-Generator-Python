@@ -3,7 +3,6 @@ import pygame
 WHITE = (255, 255, 255)
 
 class Cell:
-    visited = False
     size = 20
 
     def __init__(self, x, y, size, screen):
@@ -11,23 +10,30 @@ class Cell:
         self.y = y
         self.size = size
         self.screen = screen
-        # self.Neighbours = [None, None, None, None]
+        self.connectedNeighbors = []
+        self.visited = False
 
     def draw(self):
         size = self.size
         x = self.x * size; y = self.y * size
-        #left vertical
-        pygame.draw.line(self.screen, WHITE, (x, y), (x, y + size))
-        # #top horizontal
-        pygame.draw.line(self.screen, WHITE, (x, y), (x + size, y))
-        # #bottom horizontal
-        pygame.draw.line(self.screen, WHITE, (x, y + size), (x + size, y + size))
-        # #right vertical
-        pygame.draw.line(self.screen, WHITE, (x + size, y), (x + size, y + size))
 
         if self.visited:
             # print("draw")
-            pygame.draw.rect(self.screen, (0, 0, 255) ,(x+3, y+3, size-6, size-6))
+            pygame.draw.rect(self.screen, (0, 0, 255) ,(x, y, size, size))
+
+        if self.isConnectedTo(self.x-1, self.y) == False: #left vertical
+            pygame.draw.line(self.screen, WHITE, (x, y), (x, y + size))
+
+        if self.isConnectedTo(self.x, self.y-1) == False: # #top horizontal
+            pygame.draw.line(self.screen, WHITE, (x, y), (x + size, y))
+
+        if self.isConnectedTo(self.x, self.y+1) == False: # #bottom horizontal
+            pygame.draw.line(self.screen, WHITE, (x, y + size), (x + size, y + size))
+
+        if self.isConnectedTo(self.x+1, self.y) == False: # #right vertical
+            pygame.draw.line(self.screen, WHITE, (x + size, y), (x + size, y + size))
+
+        
 
     def getNeighbors(self, cellMap):
         x = self.x; y = self.y
@@ -46,6 +52,12 @@ class Cell:
             neighbors.append(cellMap[y-1][x])
 
         return neighbors
+
+    def isConnectedTo(self, x, y):
+        for cell in self.connectedNeighbors:
+            if cell.x == x and cell.y == y:
+                return True
+        return False
 
     def printPosition(self):
         print(self.x, self.y)
