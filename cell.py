@@ -4,6 +4,7 @@ WHITE = (255, 255, 255)
 
 class Cell:
     size = 20
+    currentSelected = None
 
     def __init__(self, x, y, size, screen):
         self.x = x
@@ -13,13 +14,16 @@ class Cell:
         self.connectedNeighbors = []
         self.visited = False
 
+
     def draw(self):
         size = self.size
         x = self.x * size; y = self.y * size
 
-        if self.visited:
-            # print("draw")
-            pygame.draw.rect(self.screen, (0, 0, 255) ,(x, y, size, size))
+        if self.visited: #fill
+            pygame.draw.rect(self.screen, (0, 0, 0) ,(x, y, size, size))
+
+        if self.currentSelected.x == self.x and self.currentSelected.y == self.y:
+            pygame.draw.rect(self.screen, (255, 255, 255) ,(x, y, size, size))
 
         if self.isConnectedTo(self.x-1, self.y) == False: #left vertical
             pygame.draw.line(self.screen, WHITE, (x, y), (x, y + size))
@@ -33,7 +37,6 @@ class Cell:
         if self.isConnectedTo(self.x+1, self.y) == False: # #right vertical
             pygame.draw.line(self.screen, WHITE, (x + size, y), (x + size, y + size))
 
-        
 
     def getNeighbors(self, cellMap):
         x = self.x; y = self.y
@@ -42,7 +45,7 @@ class Cell:
         if x > 0:
             neighbors.append(cellMap[y][x-1])
         
-        if x < len(cellMap)-1:
+        if x < len(cellMap[0])-1:
             neighbors.append(cellMap[y][x+1])
 
         if y < len(cellMap)-1:
@@ -61,7 +64,4 @@ class Cell:
 
     def printPosition(self):
         print(self.x, self.y)
-
-    # def __str__(self):
-    #     return str(self.x + " " + self.y)
         
